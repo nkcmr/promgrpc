@@ -83,7 +83,8 @@ func (d defaultPromStats) HandleRPC(ctx context.Context, statsany stats.RPCStats
 		if rpcStatus, ok := status.FromError(stats.Error); ok {
 			code = rpcStatus.Code()
 		}
-		d.metrics.handlingSeconds.WithLabelValues(carrier.streamType, carrier.service, carrier.method, code.String()).Observe(dur.Seconds())
+		d.metrics.handlingSeconds.WithLabelValues(carrier.streamType, carrier.service, carrier.method).Observe(dur.Seconds())
+		d.metrics.handledCounter.WithLabelValues(carrier.streamType, carrier.service, carrier.method, code.String()).Inc()
 	}
 }
 
