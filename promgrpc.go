@@ -194,22 +194,30 @@ var registerClientMetrics = sync.OnceFunc(func() {
 	prom.MustRegister(defaultClientMetrics)
 })
 
+// StatsHandler sets up a gRPC server with metrics using metrics that are
+// registered with the global prometheus registry.
 func StatsHandler() grpc.ServerOption {
 	registerServerMetrics()
 	return grpc.StatsHandler(defaultPromStats{metrics: defaultServerMetrics})
 }
 
+// WithStatsHandler sets up a gRPC client with metrics using metrics that are
+// registered with the global prometheus registry.
 func WithStatsHandler() grpc.DialOption {
 	registerClientMetrics()
 	return grpc.WithStatsHandler(defaultPromStats{metrics: defaultClientMetrics})
 }
 
+// StatsHandlerOnRegistry sets up a gRPC server with metrics using metrics that
+// are registered with the provided prometheus registry.
 func StatsHandlerOnRegistry(pr prom.Registerer) grpc.ServerOption {
 	m := newServerMetrics()
 	pr.MustRegister(m)
 	return grpc.StatsHandler(defaultPromStats{metrics: m})
 }
 
+// WithStatsHandlerOnRegistry sets up a gRPC client with metrics using metrics
+// that are registered with the provided prometheus registry.
 func WithStatsHandlerOnRegistry(pr prom.Registerer) grpc.DialOption {
 	m := newClientMetrics()
 	pr.MustRegister(m)
